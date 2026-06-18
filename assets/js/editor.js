@@ -22,9 +22,23 @@ const contentInput = document.querySelector("#postContent");
 const preview = document.querySelector("#postPreview");
 const publishButton = document.querySelector("#publishButton");
 const publishResult = document.querySelector("#publishResult");
+const historySelect = document.querySelector("#historyPost");
+const loadPostButton = document.querySelector("#loadPost");
+const newPostButton = document.querySelector("#newPost");
+const historyStatus = document.querySelector("#historyStatus");
+const publishModeTitle = document.querySelector("#publishModeTitle");
+const publishModeHint = document.querySelector("#publishModeHint");
 let slugWasEdited = false;
+let availablePosts = [];
+let loadedPost = null;
 
-dateInput.value = new Date().toISOString().slice(0, 10);
+function localDateString() {
+  const now = new Date();
+  const local = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
+  return local.toISOString().slice(0, 10);
+}
+
+dateInput.value = localDateString();
 
 function slugify(value) {
   const cleaned = value
@@ -103,6 +117,12 @@ function utf8ToBase64(value) {
   return btoa(binary);
 }
 
+function base64ToUtf8(value) {
+  const binary = atob(value.replace(/\s/g, ""));
+  const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
 async function githubRequest(url, options = {}, allowNotFound = false) {
   if (!tokenInput.value.trim()) throw new Error("请先输入 GitHub 令牌");
   const response = await fetch(url, {
@@ -135,6 +155,145 @@ ${content}
 `;
 }
 
+function parseYamlValue(value) {
+  const trimmed = value.trim();
+  if (trimmed.startsWith('"') && trimmed.endsWith('"')) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return trimmed.slice(1, -1);
+    }
+  }
+  if (trimmed.startsWith("'") && trimmed.endsWith("'")) return trimmed.slice(1, -1).replace(/''/g, "'");
+  return trimmed;
+}
+
+function parsePostMarkdown(markdown, fileName) {
+  const normalized = markdown.replace(/\r\n/g, "\n");
+  const match = normalized.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
+  if (!match) throw new Error("这篇文章缺少可识别的 YAML Front Matter");
+
+  const metadata = {};
+  match[1].split("\n").forEach((line) => {
+    const separator = line.indexOf(":");
+    if (separator === -1) return;
+    metadata[line.slice(0, separator).trim()] = parseYamlValue(line.slice(separator + 1));
+  });
+
+  const fileSlug = fileName.replace(/^\d{4}-\d{2}-\d{2}-/, "").replace(/\.md$/i, "");
+  const permalinkSlug = String(metadata.permalink || "").match(/^\/posts\/([^/]+)\/?$/)?.[1];
+  return {
+    title: metadata.title || fileSlug,
+    date: String(metadata.date || fileName.slice(0, 10)).slice(0, 10),
+    category: CATEGORY_LABELS[metadata.category] ? metadata.category : "ai-coding",
+    summary: metadata.summary || "",
+    slug: permalinkSlug || fileSlug,
+    content: match[2].replace(/^\n/, "").trimEnd()
+  };
+}
+
+function resetHistoryList(message = "连接 GitHub 后自动加载") {
+  availablePosts = [];
+  historySelect.replaceChildren();
+  const option = document.createElement("option");
+  option.value = "";
+  option.textContent = message;
+  historySelect.append(option);
+  historySelect.disabled = true;
+  loadPostButton.disabled = true;
+}
+
+function setPublishingMode(isEditing) {
+  publishModeTitle.textContent = isEditing ? "更新历史文章" : "发布新文章";
+  publishModeHint.textContent = isEditing
+    ? "保存后会更新原 Markdown 文件，文章地址保持不变。"
+    : "确认预览无误后，将 Markdown 发布到 GitHub。";
+  publishButton.textContent = isEditing ? "更新到 GitHub" : "发布到 GitHub";
+}
+
+function startNewPost() {
+  loadedPost = null;
+  editorForm.reset();
+  dateInput.disabled = false;
+  slugInput.disabled = false;
+  dateInput.value = localDateString();
+  slugWasEdited = false;
+  historySelect.value = "";
+  loadPostButton.disabled = true;
+  publishResult.hidden = true;
+  setPublishingMode(false);
+  updatePreview();
+}
+
+async function loadPostList() {
+  historyStatus.className = "form-status loading";
+  historyStatus.textContent = "正在读取历史文章…";
+  resetHistoryList("正在加载…");
+  try {
+    const files = await githubRequest(`https://api.github.com/repos/${REPOSITORY}/contents/_posts?ref=${BRANCH}`);
+    availablePosts = (Array.isArray(files) ? files : [])
+      .filter((file) => file.type === "file" && file.name.toLowerCase().endsWith(".md"))
+      .sort((a, b) => b.name.localeCompare(a.name));
+
+    historySelect.replaceChildren();
+    const placeholder = document.createElement("option");
+    placeholder.value = "";
+    placeholder.textContent = availablePosts.length ? "选择一篇历史文章" : "暂时没有历史文章";
+    historySelect.append(placeholder);
+    availablePosts.forEach((file) => {
+      const option = document.createElement("option");
+      option.value = file.path;
+      option.textContent = file.name.replace(/\.md$/i, "").replace(/^(\d{4}-\d{2}-\d{2})-/, "$1 · ");
+      historySelect.append(option);
+    });
+    historySelect.disabled = availablePosts.length === 0;
+    historyStatus.className = "form-status success";
+    historyStatus.textContent = availablePosts.length ? `已找到 ${availablePosts.length} 篇文章` : "暂时没有历史文章";
+  } catch (error) {
+    resetHistoryList("历史文章加载失败");
+    historyStatus.className = "form-status error";
+    historyStatus.textContent = error.message;
+  }
+}
+
+historySelect.addEventListener("change", () => {
+  loadPostButton.disabled = !historySelect.value;
+});
+
+loadPostButton.addEventListener("click", async () => {
+  const file = availablePosts.find((item) => item.path === historySelect.value);
+  if (!file) return;
+  loadPostButton.disabled = true;
+  historyStatus.className = "form-status loading";
+  historyStatus.textContent = "正在载入文章…";
+  try {
+    const payload = await githubRequest(file.url);
+    const post = parsePostMarkdown(base64ToUtf8(payload.content), file.name);
+    loadedPost = { path: file.path, sha: payload.sha };
+    titleInput.value = post.title;
+    slugInput.value = post.slug;
+    categoryInput.value = post.category;
+    dateInput.value = post.date;
+    summaryInput.value = post.summary;
+    contentInput.value = post.content;
+    slugInput.disabled = true;
+    dateInput.disabled = true;
+    slugWasEdited = true;
+    publishResult.hidden = true;
+    setPublishingMode(true);
+    updatePreview();
+    historyStatus.className = "form-status success";
+    historyStatus.textContent = `正在修改：${post.title}`;
+  } catch (error) {
+    historyStatus.className = "form-status error";
+    historyStatus.textContent = error.message;
+  } finally {
+    loadPostButton.disabled = !historySelect.value;
+  }
+});
+
+newPostButton.addEventListener("click", startNewPost);
+
 async function verifyConnection({ remember = true, restored = false } = {}) {
   connectionButton.disabled = true;
   connectionStatus.className = "form-status loading";
@@ -147,6 +306,7 @@ async function verifyConnection({ remember = true, restored = false } = {}) {
       ? `${restored ? "已自动连接" : "验证成功并已记住"}：${repo.full_name}`
       : "连接成功，但浏览器禁止保存令牌，请检查隐私或无痕模式设置";
     forgetTokenButton.disabled = false;
+    loadPostList();
     return true;
   } catch (error) {
     if (restored && error.status === 401) clearStoredToken();
@@ -163,6 +323,9 @@ connectionButton.addEventListener("click", () => verifyConnection());
 forgetTokenButton.addEventListener("click", () => {
   clearStoredToken();
   forgetTokenButton.disabled = true;
+  resetHistoryList();
+  historyStatus.className = "form-status";
+  historyStatus.textContent = "尚未读取历史文章";
   connectionStatus.className = "form-status";
   connectionStatus.textContent = "已从此浏览器清除令牌";
 });
@@ -179,7 +342,7 @@ editorForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!editorForm.reportValidity()) return;
   publishButton.disabled = true;
-  publishButton.textContent = "正在发布…";
+  publishButton.textContent = loadedPost ? "正在更新…" : "正在发布…";
   publishResult.hidden = false;
   publishResult.className = "publish-result loading";
   publishResult.textContent = "正在检查 Markdown 文章…";
@@ -190,9 +353,9 @@ editorForm.addEventListener("submit", async (event) => {
     const title = titleInput.value.trim();
     const summary = summaryInput.value.trim();
     const category = categoryInput.value;
-    const filePath = `_posts/${date}-${slug}.md`;
+    const filePath = loadedPost?.path || `_posts/${date}-${slug}.md`;
     const apiUrl = `https://api.github.com/repos/${REPOSITORY}/contents/${filePath}`;
-    const currentFile = await githubRequest(`${apiUrl}?ref=${BRANCH}`, {}, true);
+    const currentFile = loadedPost || await githubRequest(`${apiUrl}?ref=${BRANCH}`, {}, true);
     const markdown = createPostMarkdown({
       title,
       date,
@@ -218,10 +381,11 @@ editorForm.addEventListener("submit", async (event) => {
 
     const tokenSaved = saveToken();
 
+    if (loadedPost) loadedPost.sha = result.content.sha;
     const publicUrl = `/posts/${encodeURIComponent(slug)}/`;
     publishResult.className = "publish-result success";
     publishResult.innerHTML = `
-      <strong>Markdown 发布成功！</strong>
+      <strong>Markdown ${currentFile ? "更新" : "发布"}成功！</strong>
       <span>GitHub 提交 ${window.ChuBlog.escapeHtml(result.commit.sha.slice(0, 7))} 已创建。Jekyll 通常会在 30～90 秒内生成网页。</span>
       <a href="${publicUrl}" target="_blank">查看文章 →</a>`;
     forgetTokenButton.disabled = false;
@@ -229,11 +393,22 @@ editorForm.addEventListener("submit", async (event) => {
     connectionStatus.textContent = tokenSaved
       ? "发布成功，令牌已保存在此浏览器"
       : "发布成功，但浏览器禁止保存令牌";
+    historyStatus.className = "form-status success";
+    historyStatus.textContent = currentFile ? `已更新：${title}` : `已发布：${title}`;
+    if (!currentFile) {
+      await loadPostList();
+      if (availablePosts.some((file) => file.path === filePath)) {
+        historySelect.value = filePath;
+        loadPostButton.disabled = false;
+        historyStatus.className = "form-status success";
+        historyStatus.textContent = `已发布：${title}`;
+      }
+    }
   } catch (error) {
     publishResult.className = "publish-result error";
     publishResult.textContent = `发布失败：${error.message}`;
   } finally {
     publishButton.disabled = false;
-    publishButton.textContent = "发布到 GitHub";
+    publishButton.textContent = loadedPost ? "更新到 GitHub" : "发布到 GitHub";
   }
 });
