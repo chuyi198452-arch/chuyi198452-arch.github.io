@@ -1,3 +1,6 @@
+---
+layout: null
+---
 <!doctype html>
 <html lang="zh-CN">
   <head>
@@ -5,8 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Chu 的个人博客，记录 AI Coding、Web 开发与成长思考。" />
     <title>Chu's Blog · 代码与生活</title>
-    <link rel="stylesheet" href="assets/css/style.css" />
-    <script src="assets/js/main.js?v=2" defer></script>
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+    <script src="{{ '/assets/js/main.js?v=3' | relative_url }}" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到正文</a>
@@ -56,7 +59,7 @@
       </section>
 
       <section class="stats section-shell" aria-label="博客数据">
-        <div><strong data-post-count>01</strong><span>篇文章</span></div>
+        <div><strong data-post-count>{% if site.posts.size < 10 %}0{% endif %}{{ site.posts.size }}</strong><span>篇文章</span></div>
         <div><strong>02</strong><span>个主题</span></div>
         <div><strong>∞</strong><span>持续探索</span></div>
       </section>
@@ -82,7 +85,18 @@
         </div>
 
         <div class="article-grid" id="articleGrid" aria-live="polite">
-          <div class="post-loading">正在读取文章…</div>
+          {% for post in site.posts %}
+          {% assign art_index = forloop.index0 | modulo: 3 %}
+          <article class="post-card{% if forloop.first %} featured{% endif %}" data-category="{{ post.category | escape }}" data-search="{{ post.title | append: ' ' | append: post.summary | append: ' ' | append: post.category_label | downcase | escape }}">
+            <div class="post-art {% if art_index == 0 %}art-one{% elsif art_index == 1 %}art-two{% else %}art-three{% endif %}"><span>{% case post.category %}{% when 'ai-coding' %}AI{% when 'web' %}&lt;/&gt;{% else %}✦{% endcase %}</span></div>
+            <div class="post-content">
+              <div class="post-meta"><span class="tag">{{ post.category_label | escape }}</span><time datetime="{{ post.date | date_to_xmlschema }}">{{ post.date | date: "%Y.%m.%d" }}</time></div>
+              <h3><a href="{{ post.url | relative_url }}">{{ post.title | escape }}</a></h3>
+              <p>{{ post.summary | escape }}</p>
+              <a class="read-more" href="{{ post.url | relative_url }}">阅读全文 <span>→</span></a>
+            </div>
+          </article>
+          {% endfor %}
         </div>
         <p id="emptyState" class="empty-state" hidden>没有找到相关文章，换个关键词试试吧。</p>
       </section>

@@ -1,0 +1,15 @@
+title: "Chu's Blog"
+description: "记录 AI Coding、Web 开发与成长思考。"
+url: "https://chuyi198452-arch.github.io"
+baseurl: ""
+lang: zh-CN
+timezone: Asia/Shanghai
+markdown: kramdown
+highlighter: rouge
+permalink: /posts/:title/
+
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor
