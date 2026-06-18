@@ -160,6 +160,7 @@ button { color: inherit; }
 .token-controls label, .editor-fields label { display: grid; gap: 7px; font-size: 0.84rem; font-weight: 750; }
 .editor-fields small { color: var(--muted); font-size: 0.72rem; font-weight: 500; line-height: 1.4; }
 .input-with-button { display: grid; grid-template-columns: 1fr auto; gap: 9px; }
+.token-actions { display: flex; flex-wrap: wrap; gap: 9px; }
 .editor-page input, .editor-page textarea, .editor-page select { width: 100%; border: 1px solid var(--line); border-radius: 12px; outline: none; background: var(--bg); color: var(--text); }
 .editor-page input, .editor-page select { min-height: 46px; padding: 0 13px; }
 .editor-page textarea { padding: 13px; resize: vertical; line-height: 1.6; }
