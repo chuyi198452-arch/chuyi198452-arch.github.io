@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Chu 的个人博客，记录 AI Coding、Web 开发与成长思考。" />
+    <title>Chu's Blog · 代码与生活</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <script src="assets/js/main.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到正文</a>
+    <header class="site-header">
+      <div class="nav-shell">
+        <a class="brand" href="index.html" aria-label="返回首页">
+          <span class="brand-mark">C</span>
+          <span>Chu's Blog</span>
+        </a>
+        <nav class="site-nav" aria-label="主导航">
+          <a class="active" href="index.html">首页</a>
+          <a href="#articles">文章</a>
+          <a href="about.html">关于我</a>
+          <button class="theme-toggle" type="button" aria-label="切换深色模式" title="切换主题">
+            <span aria-hidden="true">◐</span>
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main">
+      <section class="hero section-shell">
+        <div class="hero-copy">
+          <p class="eyebrow">HELLO, WORLD!</p>
+          <h1>把复杂的技术，<br /><span>写成看得懂的故事。</span></h1>
+          <p class="hero-intro">
+            你好，我是 Chu。这里记录我学习 AI Coding、搭建 Web 应用，以及一路上踩过的坑和得到的灵感。
+          </p>
+          <div class="hero-actions">
+            <a class="button primary" href="#articles">开始阅读</a>
+            <a class="button secondary" href="about.html">认识我</a>
+          </div>
+        </div>
+        <div class="code-card" aria-label="代码装饰卡片">
+          <div class="code-card-top"><i></i><i></i><i></i><span>hello.js</span></div>
+          <pre><code><span class="code-purple">const</span> dream = {
+  idea: <span class="code-green">"做点有趣的事"</span>,
+  action: <span class="code-green">"现在就开始"</span>
+};
+
+<span class="code-purple">while</span> (dream.idea) {
+  learn();
+  build();
+  share();
+}</code></pre>
+        </div>
+      </section>
+
+      <section class="stats section-shell" aria-label="博客数据">
+        <div><strong>03</strong><span>篇文章</span></div>
+        <div><strong>02</strong><span>个主题</span></div>
+        <div><strong>∞</strong><span>持续探索</span></div>
+      </section>
+
+      <section id="articles" class="articles section-shell">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">LATEST WRITING</p>
+            <h2>最近文章</h2>
+          </div>
+          <label class="search-box">
+            <span aria-hidden="true">⌕</span>
+            <span class="sr-only">搜索文章</span>
+            <input id="articleSearch" type="search" placeholder="搜索标题或标签…" autocomplete="off" />
+          </label>
+        </div>
+
+        <div class="filter-row" role="group" aria-label="文章分类筛选">
+          <button class="filter-chip active" type="button" data-filter="all">全部</button>
+          <button class="filter-chip" type="button" data-filter="ai-coding">AI Coding</button>
+          <button class="filter-chip" type="button" data-filter="web">Web 开发</button>
+          <button class="filter-chip" type="button" data-filter="thinking">成长思考</button>
+        </div>
+
+        <div class="article-grid" id="articleGrid">
+          <article class="post-card featured" data-category="ai-coding" data-search="ai coding 第一个应用 小白">
+            <div class="post-art art-one"><span>AI</span></div>
+            <div class="post-content">
+              <div class="post-meta"><span class="tag">AI Coding</span><time datetime="2026-06-18">2026.06.18</time></div>
+              <h3><a href="posts/ai-coding-first-app.html">AI Coding 小白的第一个应用：从想法到上线</a></h3>
+              <p>不背一堆术语，先走通“描述需求—生成代码—测试修改—发布上线”的完整闭环。</p>
+              <a class="read-more" href="posts/ai-coding-first-app.html">阅读全文 <span>→</span></a>
+            </div>
+          </article>
+
+          <article class="post-card" data-category="web" data-search="html css javascript 网页 入门">
+            <div class="post-art art-two"><span>&lt;/&gt;</span></div>
+            <div class="post-content">
+              <div class="post-meta"><span class="tag">Web 开发</span><time datetime="2026-06-12">2026.06.12</time></div>
+              <h3><a href="#">HTML、CSS 和 JavaScript 到底各自做什么？</a></h3>
+              <p>用“盖房子”的方式，理解网页开发最核心的三件套。</p>
+              <span class="read-more muted">文章准备中</span>
+            </div>
+          </article>
+
+          <article class="post-card" data-category="thinking" data-search="成长 学习 项目 思考">
+            <div class="post-art art-three"><span>✦</span></div>
+            <div class="post-content">
+              <div class="post-meta"><span class="tag">成长思考</span><time datetime="2026-06-05">2026.06.05</time></div>
+              <h3><a href="#">为什么“做完一个小项目”胜过看完十套教程</a></h3>
+              <p>真正的理解往往发生在你亲手解决第一个报错的时候。</p>
+              <span class="read-more muted">文章准备中</span>
+            </div>
+          </article>
+        </div>
+        <p id="emptyState" class="empty-state" hidden>没有找到相关文章，换个关键词试试吧。</p>
+      </section>
+
+      <section class="newsletter section-shell">
+        <div>
+          <p class="eyebrow">KEEP BUILDING</p>
+          <h2>慢慢写，持续做。</h2>
+          <p>这个博客会和我一起成长。下一篇，也许就是一次新的尝试。</p>
+        </div>
+        <a class="button primary" href="about.html">了解更多</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-shell footer-inner">
+        <p>© <span data-current-year></span> Chu. Built by hand, with a little help from AI.</p>
+        <a href="#main">回到顶部 ↑</a>
+      </div>
+    </footer>
+  </body>
+</html>
