@@ -1,6 +1,16 @@
 {
   "posts": [
     {
+      "slug": "blog",
+      "title": "第一篇blog",
+      "category": "ai-coding",
+      "categoryLabel": "AI Coding",
+      "date": "2026-06-18",
+      "summary": "这是旅程碑的开始",
+      "content": "记录第一次blog\n在ai大潮下，我一个编程小白也开始用codex编程建立新的blog网站",
+      "updatedAt": "2026-06-18T08:06:18.431Z"
+    },
+    {
       "slug": "ai-coding-first-app",
       "title": "AI Coding 小白的第一个应用：从想法到上线",
       "category": "ai-coding",
