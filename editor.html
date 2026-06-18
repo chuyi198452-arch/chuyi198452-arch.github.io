@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>文章编辑器 · Chu's Blog</title>
+    <link rel="stylesheet" href="assets/css/style.css" />
+    <script src="assets/js/main.js?v=2" defer></script>
+    <script src="assets/js/editor.js?v=2" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到编辑器</a>
+    <header class="site-header">
+      <div class="nav-shell">
+        <a class="brand" href="index.html"><span class="brand-mark">C</span><span>Chu's Blog</span></a>
+        <nav class="site-nav" aria-label="主导航">
+          <a href="index.html">查看博客</a>
+          <a class="active" href="editor.html">写文章</a>
+          <button class="theme-toggle" type="button" aria-label="切换深色模式" title="切换主题"><span aria-hidden="true">◐</span></button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="editor-page section-shell">
+      <header class="editor-heading">
+        <div>
+          <p class="eyebrow">BLOG STUDIO</p>
+          <h1>写点新东西。</h1>
+          <p>使用 Markdown 编辑，确认预览后直接发布到 GitHub。</p>
+        </div>
+        <span class="security-badge">令牌仅存于当前页面</span>
+      </header>
+
+      <section class="token-panel" aria-labelledby="tokenTitle">
+        <div>
+          <h2 id="tokenTitle">1. 连接 GitHub</h2>
+          <p>创建只允许访问 <strong>chu-bolg</strong>、权限为 <strong>Contents: Read and write</strong> 的 Fine-grained token。不要使用长期或全仓库令牌。</p>
+          <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noreferrer">去 GitHub 创建令牌 ↗</a>
+        </div>
+        <div class="token-controls">
+          <label for="githubToken">GitHub 令牌</label>
+          <div class="input-with-button">
+            <input id="githubToken" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+            <button id="testConnection" class="button secondary" type="button">测试连接</button>
+          </div>
+          <p id="connectionStatus" class="form-status" role="status">尚未连接</p>
+        </div>
+      </section>
+
+      <form id="editorForm" class="editor-form">
+        <div class="editor-fields">
+          <div class="field-row">
+            <label>文章标题<input id="postTitle" name="title" required maxlength="90" placeholder="给文章一个清楚的标题" /></label>
+            <label>文章地址<input id="postSlug" name="slug" required pattern="[a-z0-9-]+" placeholder="my-new-post" /><small>仅使用英文小写、数字和连字符；中文标题会自动生成日期地址。</small></label>
+          </div>
+          <div class="field-row three">
+            <label>分类
+              <select id="postCategory" name="category">
+                <option value="ai-coding">AI Coding</option>
+                <option value="web">Web 开发</option>
+                <option value="thinking">成长思考</option>
+              </select>
+            </label>
+            <label>发布日期<input id="postDate" name="date" type="date" required /></label>
+            <label>预计阅读<input id="readingTime" type="text" value="约 5 分钟" disabled /></label>
+          </div>
+          <label>文章摘要<textarea id="postSummary" name="summary" required maxlength="180" rows="3" placeholder="用一两句话介绍这篇文章"></textarea></label>
+          <label>正文（Markdown）
+            <textarea id="postContent" name="content" required rows="20" placeholder="## 第一个小标题&#10;&#10;从这里开始写正文……"></textarea>
+          </label>
+        </div>
+
+        <aside class="editor-preview" aria-label="文章预览">
+          <div class="preview-toolbar"><strong>实时预览</strong><span>安全模式</span></div>
+          <article id="postPreview" class="prose preview-content"></article>
+        </aside>
+
+        <div class="publish-bar">
+          <div>
+            <strong>准备好了吗？</strong>
+            <p>同一文章地址再次发布会更新原文章。</p>
+          </div>
+          <button id="publishButton" class="button primary" type="submit">发布到 GitHub</button>
+        </div>
+      </form>
+
+      <div id="publishResult" class="publish-result" role="status" hidden></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-shell footer-inner"><p>© <span data-current-year></span> Chu.</p><a href="index.html">返回博客</a></div>
+    </footer>
+  </body>
+</html>
