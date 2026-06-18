@@ -7,7 +7,7 @@
     <title>文章编辑器 · Chu's Blog</title>
     <link rel="stylesheet" href="assets/css/style.css" />
     <script src="assets/js/main.js?v=3" defer></script>
-    <script src="assets/js/editor.js?v=4" defer></script>
+    <script src="assets/js/editor.js?v=5" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到编辑器</a>
@@ -51,6 +51,24 @@
         </div>
       </section>
 
+      <section class="history-panel" aria-labelledby="historyTitle">
+        <div>
+          <h2 id="historyTitle">2. 修改历史文章</h2>
+          <p>连接 GitHub 后选择一篇文章，编辑器会载入原来的标题、摘要和 Markdown 正文。</p>
+        </div>
+        <div class="history-controls">
+          <label for="historyPost">历史文章</label>
+          <div class="history-actions">
+            <select id="historyPost" disabled>
+              <option value="">连接 GitHub 后自动加载</option>
+            </select>
+            <button id="loadPost" class="button secondary" type="button" disabled>载入修改</button>
+            <button id="newPost" class="button secondary" type="button">写新文章</button>
+          </div>
+          <p id="historyStatus" class="form-status" role="status">尚未读取历史文章</p>
+        </div>
+      </section>
+
       <form id="editorForm" class="editor-form">
         <div class="editor-fields">
           <div class="field-row">
@@ -81,8 +99,8 @@
 
         <div class="publish-bar">
           <div>
-            <strong>准备好了吗？</strong>
-            <p>相同日期和文章地址再次发布会更新原文章。</p>
+            <strong id="publishModeTitle">发布新文章</strong>
+            <p id="publishModeHint">确认预览无误后，将 Markdown 发布到 GitHub。</p>
           </div>
           <button id="publishButton" class="button primary" type="submit">发布到 GitHub</button>
         </div>
