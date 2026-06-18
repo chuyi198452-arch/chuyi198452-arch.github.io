@@ -7,7 +7,7 @@
     <title>文章编辑器 · Chu's Blog</title>
     <link rel="stylesheet" href="assets/css/style.css" />
     <script src="assets/js/main.js?v=3" defer></script>
-    <script src="assets/js/editor.js?v=3" defer></script>
+    <script src="assets/js/editor.js?v=4" defer></script>
   </head>
   <body>
     <a class="skip-link" href="#main">跳到编辑器</a>
@@ -29,20 +29,23 @@
           <h1>写点新东西。</h1>
           <p>使用 Markdown 编辑，确认预览后直接发布到 GitHub。</p>
         </div>
-        <span class="security-badge">令牌仅存于当前页面</span>
+        <span class="security-badge">令牌仅保存在此浏览器</span>
       </header>
 
       <section class="token-panel" aria-labelledby="tokenTitle">
         <div>
           <h2 id="tokenTitle">1. 连接 GitHub</h2>
-          <p>创建只允许访问 <strong>chuyi198452-arch.github.io</strong>、权限为 <strong>Contents: Read and write</strong> 的 Fine-grained token。不要使用长期或全仓库令牌。</p>
+          <p>令牌只允许访问 <strong>chuyi198452-arch.github.io</strong>，并设置 <strong>Contents: Read and write</strong>。第一次验证成功后，这台设备会自动连接；请勿在公用电脑上使用。</p>
           <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noreferrer">去 GitHub 创建令牌 ↗</a>
         </div>
         <div class="token-controls">
           <label for="githubToken">GitHub 令牌</label>
           <div class="input-with-button">
             <input id="githubToken" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
-            <button id="testConnection" class="button secondary" type="button">测试连接</button>
+            <div class="token-actions">
+              <button id="testConnection" class="button secondary" type="button">验证并记住</button>
+              <button id="forgetToken" class="button secondary" type="button">忘记令牌</button>
+            </div>
           </div>
           <p id="connectionStatus" class="form-status" role="status">尚未连接</p>
         </div>

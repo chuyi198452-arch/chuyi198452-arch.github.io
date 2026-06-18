@@ -1,6 +1,7 @@
 const REPOSITORY = "chuyi198452-arch/chuyi198452-arch.github.io";
 const BRANCH = "main";
 const API_VERSION = "2026-03-10";
+const TOKEN_STORAGE_KEY = `chu-blog:${REPOSITORY}:github-token`;
 const CATEGORY_LABELS = {
   "ai-coding": "AI Coding",
   web: "Web 开发",
@@ -9,6 +10,7 @@ const CATEGORY_LABELS = {
 
 const tokenInput = document.querySelector("#githubToken");
 const connectionButton = document.querySelector("#testConnection");
+const forgetTokenButton = document.querySelector("#forgetToken");
 const connectionStatus = document.querySelector("#connectionStatus");
 const editorForm = document.querySelector("#editorForm");
 const titleInput = document.querySelector("#postTitle");
@@ -68,6 +70,32 @@ function apiHeaders() {
   };
 }
 
+function loadStoredToken() {
+  try {
+    return localStorage.getItem(TOKEN_STORAGE_KEY) || "";
+  } catch {
+    return "";
+  }
+}
+
+function saveToken() {
+  try {
+    localStorage.setItem(TOKEN_STORAGE_KEY, tokenInput.value.trim());
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function clearStoredToken() {
+  try {
+    localStorage.removeItem(TOKEN_STORAGE_KEY);
+  } catch {
+    // 浏览器禁用存储时，清空当前输入框仍然有效。
+  }
+  tokenInput.value = "";
+}
+
 function utf8ToBase64(value) {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
@@ -85,7 +113,9 @@ async function githubRequest(url, options = {}, allowNotFound = false) {
   if (allowNotFound && response.status === 404) return null;
   if (!response.ok) {
     const hint = response.status === 401 ? "令牌无效或已过期" : response.status === 403 ? "令牌缺少 Contents 写入权限" : payload.message;
-    throw new Error(hint || `GitHub 请求失败（${response.status}）`);
+    const error = new Error(hint || `GitHub 请求失败（${response.status}）`);
+    error.status = response.status;
+    throw error;
   }
   return payload;
 }
@@ -105,21 +135,45 @@ ${content}
 `;
 }
 
-connectionButton.addEventListener("click", async () => {
+async function verifyConnection({ remember = true, restored = false } = {}) {
   connectionButton.disabled = true;
   connectionStatus.className = "form-status loading";
-  connectionStatus.textContent = "正在验证…";
+  connectionStatus.textContent = restored ? "正在恢复已保存的连接…" : "正在验证…";
   try {
     const repo = await githubRequest(`https://api.github.com/repos/${REPOSITORY}`);
-    connectionStatus.className = "form-status success";
-    connectionStatus.textContent = `连接成功：${repo.full_name}`;
+    const tokenSaved = !remember || saveToken();
+    connectionStatus.className = tokenSaved ? "form-status success" : "form-status error";
+    connectionStatus.textContent = tokenSaved
+      ? `${restored ? "已自动连接" : "验证成功并已记住"}：${repo.full_name}`
+      : "连接成功，但浏览器禁止保存令牌，请检查隐私或无痕模式设置";
+    forgetTokenButton.disabled = false;
+    return true;
   } catch (error) {
+    if (restored && error.status === 401) clearStoredToken();
     connectionStatus.className = "form-status error";
     connectionStatus.textContent = error.message;
+    return false;
   } finally {
     connectionButton.disabled = false;
   }
+}
+
+connectionButton.addEventListener("click", () => verifyConnection());
+
+forgetTokenButton.addEventListener("click", () => {
+  clearStoredToken();
+  forgetTokenButton.disabled = true;
+  connectionStatus.className = "form-status";
+  connectionStatus.textContent = "已从此浏览器清除令牌";
 });
+
+const storedToken = loadStoredToken();
+if (storedToken) {
+  tokenInput.value = storedToken;
+  verifyConnection({ remember: false, restored: true });
+} else {
+  forgetTokenButton.disabled = true;
+}
 
 editorForm.addEventListener("submit", async (event) => {
   event.preventDefault();
@@ -162,14 +216,19 @@ editorForm.addEventListener("submit", async (event) => {
       body: JSON.stringify(body)
     });
 
+    const tokenSaved = saveToken();
+
     const publicUrl = `/posts/${encodeURIComponent(slug)}/`;
     publishResult.className = "publish-result success";
     publishResult.innerHTML = `
       <strong>Markdown 发布成功！</strong>
       <span>GitHub 提交 ${window.ChuBlog.escapeHtml(result.commit.sha.slice(0, 7))} 已创建。Jekyll 通常会在 30～90 秒内生成网页。</span>
       <a href="${publicUrl}" target="_blank">查看文章 →</a>`;
-    tokenInput.value = "";
-    connectionStatus.textContent = "已发布并清除页面中的令牌";
+    forgetTokenButton.disabled = false;
+    connectionStatus.className = tokenSaved ? "form-status success" : "form-status error";
+    connectionStatus.textContent = tokenSaved
+      ? "发布成功，令牌已保存在此浏览器"
+      : "发布成功，但浏览器禁止保存令牌";
   } catch (error) {
     publishResult.className = "publish-result error";
     publishResult.textContent = `发布失败：${error.message}`;

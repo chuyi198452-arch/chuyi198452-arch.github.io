@@ -44,7 +44,8 @@ chuyi198452-arch.github.io/
 1. Repository access 只选择 `chuyi198452-arch.github.io`。
 2. Repository permissions 中将 `Contents` 设置为 `Read and write`。
 3. 建议设置较短的过期时间。
-4. 令牌只保存在编辑器当前页面的内存中，发布成功后会立即清空，不会写进网站代码或浏览器存储。
+4. 第一次点击“验证并记住”后，令牌会保存在当前浏览器的本地存储中，以后打开编辑器会自动连接。
+5. 不要在公用电脑上保存令牌；可随时点击“忘记令牌”从浏览器中清除。
 
 编辑器通过 GitHub Contents API 创建或更新 `_posts/YYYY-MM-DD-name.md`。`main` 分支变化后，Jekyll 会生成 HTML，GitHub Pages 会自动重新发布。
 
