@@ -99,18 +99,13 @@ function renderMarkdown(markdown = "") {
   return html.join("\n");
 }
 
-function formatDate(dateString) {
-  return String(dateString || "").replaceAll("-", ".");
-}
-
-window.ChuBlog = { escapeHtml, renderMarkdown, formatDate };
+window.ChuBlog = { escapeHtml, renderMarkdown };
 
 const searchInput = document.querySelector("#articleSearch");
 const filterButtons = [...document.querySelectorAll(".filter-chip")];
-const articleGrid = document.querySelector("#articleGrid");
+const postCards = [...document.querySelectorAll(".post-card")];
 const emptyState = document.querySelector("#emptyState");
 let activeFilter = "all";
-let postCards = [];
 
 function filterArticles() {
   const query = searchInput?.value.trim().toLowerCase() ?? "";
@@ -127,45 +122,6 @@ function filterArticles() {
   if (emptyState) emptyState.hidden = visibleCount !== 0;
 }
 
-function renderPostCards(posts) {
-  if (!articleGrid) return;
-  const artClasses = ["art-one", "art-two", "art-three"];
-  articleGrid.innerHTML = posts.map((post, index) => {
-    const featured = index === 0 ? " featured" : "";
-    const symbol = post.category === "ai-coding" ? "AI" : post.category === "web" ? "</>" : "✦";
-    const searchText = `${post.title} ${post.summary} ${post.categoryLabel}`.toLowerCase();
-    const href = `post.html?slug=${encodeURIComponent(post.slug)}`;
-    return `
-      <article class="post-card${featured}" data-category="${escapeHtml(post.category)}" data-search="${escapeHtml(searchText)}">
-        <div class="post-art ${artClasses[index % artClasses.length]}"><span>${escapeHtml(symbol)}</span></div>
-        <div class="post-content">
-          <div class="post-meta"><span class="tag">${escapeHtml(post.categoryLabel)}</span><time datetime="${escapeHtml(post.date)}">${formatDate(post.date)}</time></div>
-          <h3><a href="${href}">${escapeHtml(post.title)}</a></h3>
-          <p>${escapeHtml(post.summary)}</p>
-          <a class="read-more" href="${href}">阅读全文 <span>→</span></a>
-        </div>
-      </article>`;
-  }).join("");
-  postCards = [...articleGrid.querySelectorAll(".post-card")];
-  document.querySelectorAll("[data-post-count]").forEach((element) => {
-    element.textContent = String(posts.length).padStart(2, "0");
-  });
-  filterArticles();
-}
-
-async function loadPosts() {
-  if (!articleGrid) return;
-  try {
-    const response = await fetch(`data/posts.json?v=${Date.now()}`);
-    if (!response.ok) throw new Error("文章数据读取失败");
-    const data = await response.json();
-    const posts = [...data.posts].sort((a, b) => b.date.localeCompare(a.date));
-    renderPostCards(posts);
-  } catch (error) {
-    articleGrid.innerHTML = `<p class="empty-state">暂时无法读取文章，请稍后刷新。</p>`;
-  }
-}
-
 searchInput?.addEventListener("input", filterArticles);
 filterButtons.forEach((button) => {
   button.addEventListener("click", () => {
@@ -174,5 +130,3 @@ filterButtons.forEach((button) => {
     filterArticles();
   });
 });
-
-loadPosts();

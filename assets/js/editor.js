@@ -1,5 +1,4 @@
-const REPOSITORY = "chuyi198452-arch/chu-bolg";
-const DATA_PATH = "data/posts.json";
+const REPOSITORY = "chuyi198452-arch/chuyi198452-arch.github.io";
 const BRANCH = "main";
 const API_VERSION = "2026-03-10";
 const CATEGORY_LABELS = {
@@ -69,11 +68,6 @@ function apiHeaders() {
   };
 }
 
-function base64ToUtf8(value) {
-  const bytes = Uint8Array.from(atob(value.replace(/\n/g, "")), (char) => char.charCodeAt(0));
-  return new TextDecoder().decode(bytes);
-}
-
 function utf8ToBase64(value) {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
@@ -81,18 +75,34 @@ function utf8ToBase64(value) {
   return btoa(binary);
 }
 
-async function githubRequest(url, options = {}) {
+async function githubRequest(url, options = {}, allowNotFound = false) {
   if (!tokenInput.value.trim()) throw new Error("请先输入 GitHub 令牌");
   const response = await fetch(url, {
     ...options,
     headers: { ...apiHeaders(), ...(options.headers || {}) }
   });
   const payload = await response.json().catch(() => ({}));
+  if (allowNotFound && response.status === 404) return null;
   if (!response.ok) {
     const hint = response.status === 401 ? "令牌无效或已过期" : response.status === 403 ? "令牌缺少 Contents 写入权限" : payload.message;
     throw new Error(hint || `GitHub 请求失败（${response.status}）`);
   }
   return payload;
+}
+
+function createPostMarkdown({ title, date, category, summary, slug, content }) {
+  return `---
+layout: post
+title: ${JSON.stringify(title)}
+date: ${date} 08:00:00 +0800
+category: ${category}
+category_label: ${JSON.stringify(CATEGORY_LABELS[category])}
+summary: ${JSON.stringify(summary)}
+permalink: /posts/${slug}/
+---
+
+${content}
+`;
 }
 
 connectionButton.addEventListener("click", async () => {
@@ -118,44 +128,45 @@ editorForm.addEventListener("submit", async (event) => {
   publishButton.textContent = "正在发布…";
   publishResult.hidden = false;
   publishResult.className = "publish-result loading";
-  publishResult.textContent = "正在读取文章列表…";
+  publishResult.textContent = "正在检查 Markdown 文章…";
 
   try {
-    const apiUrl = `https://api.github.com/repos/${REPOSITORY}/contents/${DATA_PATH}?ref=${BRANCH}`;
-    const currentFile = await githubRequest(apiUrl);
-    const data = JSON.parse(base64ToUtf8(currentFile.content));
     const slug = slugInput.value.trim();
-    const post = {
+    const date = dateInput.value;
+    const title = titleInput.value.trim();
+    const summary = summaryInput.value.trim();
+    const category = categoryInput.value;
+    const filePath = `_posts/${date}-${slug}.md`;
+    const apiUrl = `https://api.github.com/repos/${REPOSITORY}/contents/${filePath}`;
+    const currentFile = await githubRequest(`${apiUrl}?ref=${BRANCH}`, {}, true);
+    const markdown = createPostMarkdown({
+      title,
+      date,
+      category,
+      summary,
       slug,
-      title: titleInput.value.trim(),
-      category: categoryInput.value,
-      categoryLabel: CATEGORY_LABELS[categoryInput.value],
-      date: dateInput.value,
-      summary: summaryInput.value.trim(),
-      content: contentInput.value.trim(),
-      updatedAt: new Date().toISOString()
-    };
-    const existingIndex = data.posts.findIndex((item) => item.slug === slug);
-    if (existingIndex >= 0) data.posts[existingIndex] = post;
-    else data.posts.unshift(post);
-
-    publishResult.textContent = "正在创建 GitHub 提交…";
-    const result = await githubRequest(`https://api.github.com/repos/${REPOSITORY}/contents/${DATA_PATH}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: `${existingIndex >= 0 ? "update" : "publish"} post: ${post.title}`,
-        content: utf8ToBase64(`${JSON.stringify(data, null, 2)}\n`),
-        sha: currentFile.sha,
-        branch: BRANCH
-      })
+      content: contentInput.value.trim()
     });
 
-    const publicUrl = `post.html?slug=${encodeURIComponent(slug)}`;
+    publishResult.textContent = "正在创建 GitHub 提交…";
+    const body = {
+      message: `${currentFile ? "update" : "publish"} post: ${title}`,
+      content: utf8ToBase64(markdown),
+      branch: BRANCH
+    };
+    if (currentFile) body.sha = currentFile.sha;
+
+    const result = await githubRequest(apiUrl, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    const publicUrl = `/posts/${encodeURIComponent(slug)}/`;
     publishResult.className = "publish-result success";
     publishResult.innerHTML = `
-      <strong>发布成功！</strong>
-      <span>GitHub 提交 ${window.ChuBlog.escapeHtml(result.commit.sha.slice(0, 7))} 已创建。域名通常会在 30～90 秒内更新。</span>
+      <strong>Markdown 发布成功！</strong>
+      <span>GitHub 提交 ${window.ChuBlog.escapeHtml(result.commit.sha.slice(0, 7))} 已创建。Jekyll 通常会在 30～90 秒内生成网页。</span>
       <a href="${publicUrl}" target="_blank">查看文章 →</a>`;
     tokenInput.value = "";
     connectionStatus.textContent = "已发布并清除页面中的令牌";
