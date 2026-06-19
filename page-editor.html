@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>页面设计器 · Chu's Blog</title>
+    <link rel="stylesheet" href="assets/css/style.css?v=6" />
+    <script src="assets/js/main.js?v=3" defer></script>
+    <script src="assets/js/page-editor.js?v=1" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到页面设计器</a>
+    <header class="site-header">
+      <div class="nav-shell">
+        <a class="brand" href="index.html"><span class="brand-mark">C</span><span>Chu's Blog</span></a>
+        <nav class="site-nav" aria-label="主导航">
+          <a href="index.html">查看博客</a>
+          <a href="editor.html">写文章</a>
+          <a class="active" href="page-editor.html">设计页面</a>
+          <button class="theme-toggle" type="button" aria-label="切换深色模式" title="切换主题"><span aria-hidden="true">◐</span></button>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main" class="editor-page designer-page section-shell">
+      <header class="editor-heading">
+        <div>
+          <p class="eyebrow">VISUAL SITE DESIGNER</p>
+          <h1>把首页调成喜欢的样子。</h1>
+          <p>修改文字、颜色、图片和布局，右侧会实时预览；保存后由 GitHub Pages 自动上线。</p>
+        </div>
+        <span class="security-badge">只修改首页配置</span>
+      </header>
+
+      <section class="token-panel" aria-labelledby="designerTokenTitle">
+        <div>
+          <h2 id="designerTokenTitle">1. 连接 GitHub</h2>
+          <p>与文章编辑器共用已保存的令牌。令牌只保存在当前浏览器，不会写入网页或仓库。</p>
+        </div>
+        <div class="token-controls">
+          <label for="designerGithubToken">GitHub 令牌</label>
+          <div class="input-with-button">
+            <input id="designerGithubToken" type="password" placeholder="github_pat_…" autocomplete="off" spellcheck="false" />
+            <div class="token-actions">
+              <button id="designerConnect" class="button secondary" type="button">验证并载入</button>
+              <button id="designerForgetToken" class="button secondary" type="button">忘记令牌</button>
+            </div>
+          </div>
+          <p id="designerConnectionStatus" class="form-status" role="status">尚未连接，当前显示默认配置</p>
+        </div>
+      </section>
+
+      <form id="pageDesignerForm" class="designer-workspace">
+        <div class="designer-controls">
+          <section class="designer-group">
+            <div class="designer-group-heading"><span>01</span><div><h2>品牌与首屏</h2><p>访客打开首页最先看到的内容。</p></div></div>
+            <div class="field-row">
+              <label>网站名称<input id="homeBrand" name="brand" required maxlength="40" /></label>
+              <label>品牌缩写<input id="homeBrandMark" name="brand_mark" required maxlength="2" /></label>
+            </div>
+            <label>浏览器描述<textarea id="homeMetaDescription" name="meta_description" required maxlength="160" rows="2"></textarea></label>
+            <label>标题上方小字<input id="homeEyebrow" name="eyebrow" required maxlength="40" /></label>
+            <div class="field-row">
+              <label>主标题<input id="homeHeroTitle" name="hero_title" required maxlength="50" /></label>
+              <label>强调标题<input id="homeHeroHighlight" name="hero_highlight" required maxlength="50" /></label>
+            </div>
+            <label>首页介绍<textarea id="homeHeroIntro" name="hero_intro" required maxlength="220" rows="4"></textarea></label>
+            <div class="field-row">
+              <label>主按钮文字<input id="homePrimaryButton" name="primary_button" required maxlength="16" /></label>
+              <label>次按钮文字<input id="homeSecondaryButton" name="secondary_button" required maxlength="16" /></label>
+            </div>
+          </section>
+
+          <section class="designer-group">
+            <div class="designer-group-heading"><span>02</span><div><h2>颜色与布局</h2><p>选择比手写 CSS 更安全的预设。</p></div></div>
+            <div class="color-field-row">
+              <label>主题色<span class="color-input"><input id="homeAccent" name="accent" type="color" /><output id="homeAccentValue"></output></span></label>
+              <label>深色主题色<span class="color-input"><input id="homeAccentDark" name="accent_dark" type="color" /><output id="homeAccentDarkValue"></output></span></label>
+            </div>
+            <div class="field-row">
+              <label>首屏布局
+                <select id="homeHeroLayout" name="hero_layout">
+                  <option value="text-left">文字在左</option>
+                  <option value="text-right">文字在右</option>
+                  <option value="stacked">上下排列</option>
+                </select>
+              </label>
+              <label>文章卡片列数
+                <select id="homeArticleColumns" name="article_columns">
+                  <option value="2">两列</option>
+                  <option value="1">一列</option>
+                </select>
+              </label>
+            </div>
+          </section>
+
+          <section class="designer-group">
+            <div class="designer-group-heading"><span>03</span><div><h2>首屏展示图</h2><p>保留代码卡片，或者上传一张自己的图片。</p></div></div>
+            <label>展示方式
+              <select id="homeHeroVisual" name="hero_visual">
+                <option value="code">代码卡片</option>
+                <option value="image">自定义图片</option>
+              </select>
+            </label>
+            <label>选择图片<input id="homeHeroImageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" /><small>支持 JPG、PNG、WebP、GIF，建议小于 1MB，最大 3MB。</small></label>
+            <label>当前图片路径<input id="homeHeroImage" name="hero_image" readonly placeholder="尚未上传图片" /></label>
+            <label>图片说明<input id="homeHeroImageAlt" name="hero_image_alt" maxlength="80" /></label>
+          </section>
+
+          <section class="designer-group">
+            <div class="designer-group-heading"><span>04</span><div><h2>首页底部</h2><p>调整文章列表下方的行动提示。</p></div></div>
+            <label>小标题<input id="homeNewsletterEyebrow" name="newsletter_eyebrow" required maxlength="40" /></label>
+            <label>主标题<input id="homeNewsletterTitle" name="newsletter_title" required maxlength="60" /></label>
+            <label>说明文字<textarea id="homeNewsletterText" name="newsletter_text" required maxlength="180" rows="3"></textarea></label>
+            <div class="field-row">
+              <label>按钮文字<input id="homeNewsletterButton" name="newsletter_button" required maxlength="16" /></label>
+              <label>页脚文字<input id="homeFooterText" name="footer_text" required maxlength="100" /></label>
+            </div>
+          </section>
+        </div>
+
+        <aside class="designer-preview" aria-label="首页实时预览">
+          <div class="preview-toolbar">
+            <strong>首页实时预览</strong>
+            <button id="reloadDesignerPreview" class="text-button" type="button">重新载入</button>
+          </div>
+          <iframe id="homePreviewFrame" title="首页预览" src="index.html?designer-preview=1"></iframe>
+        </aside>
+
+        <div class="publish-bar designer-publish-bar">
+          <div>
+            <strong>保存首页设计</strong>
+            <p>保存会提交配置和新图片到 GitHub，通常 30～90 秒后上线。</p>
+          </div>
+          <button id="saveHomeDesign" class="button primary" type="submit">保存到 GitHub</button>
+        </div>
+      </form>
+
+      <div id="designerResult" class="publish-result" role="status" hidden></div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="section-shell footer-inner"><p>© <span data-current-year></span> Chu.</p><a href="index.html">返回博客</a></div>
+    </footer>
+  </body>
+</html>
