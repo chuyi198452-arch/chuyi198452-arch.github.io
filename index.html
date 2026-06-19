@@ -1,14 +1,15 @@
 ---
 layout: null
 ---
+{% assign home = site.data.home %}
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" style="--accent: {{ home.accent | default: '#ff5c35' }}; --accent-dark: {{ home.accent_dark | default: '#d83d1b' }};">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Chu 的个人博客，记录 AI Coding、Web 开发与成长思考。" />
-    <title>Chu's Blog · 代码与生活</title>
-    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}" />
+    <meta name="description" content="{{ home.meta_description | default: 'Chu 的个人博客，记录 AI Coding、Web 开发与成长思考。' | escape }}" />
+    <title>{{ home.brand | default: "Chu's Blog" | escape }} · 代码与生活</title>
+    <link rel="stylesheet" href="{{ '/assets/css/style.css' | relative_url }}?v=6" />
     <script src="{{ '/assets/js/main.js?v=3' | relative_url }}" defer></script>
   </head>
   <body>
@@ -16,8 +17,8 @@ layout: null
     <header class="site-header">
       <div class="nav-shell">
         <a class="brand" href="index.html" aria-label="返回首页">
-          <span class="brand-mark">C</span>
-          <span>Chu's Blog</span>
+          <span class="brand-mark">{{ home.brand_mark | default: 'C' | escape }}</span>
+          <span>{{ home.brand | default: "Chu's Blog" | escape }}</span>
         </a>
         <nav class="site-nav" aria-label="主导航">
           <a class="active" href="index.html">首页</a>
@@ -31,19 +32,25 @@ layout: null
     </header>
 
     <main id="main">
-      <section class="hero section-shell">
+      <section class="hero hero-layout-{{ home.hero_layout | default: 'text-left' }} section-shell">
         <div class="hero-copy">
-          <p class="eyebrow">HELLO, WORLD!</p>
-          <h1>把复杂的技术，<br /><span>写成看得懂的故事。</span></h1>
+          <p class="eyebrow">{{ home.eyebrow | default: 'HELLO, WORLD!' | escape }}</p>
+          <h1>{{ home.hero_title | default: '把复杂的技术，' | escape }}<br /><span>{{ home.hero_highlight | default: '写成看得懂的故事。' | escape }}</span></h1>
           <p class="hero-intro">
-            你好，我是 Chu。这里记录我学习 AI Coding、搭建 Web 应用，以及一路上踩过的坑和得到的灵感。
+            {{ home.hero_intro | default: '你好，我是 Chu。这里记录我学习 AI Coding、搭建 Web 应用，以及一路上踩过的坑和得到的灵感。' | escape }}
           </p>
           <div class="hero-actions">
-            <a class="button primary" href="#articles">开始阅读</a>
-            <a class="button secondary" href="about.html">认识我</a>
+            <a class="button primary" href="#articles">{{ home.primary_button | default: '开始阅读' | escape }}</a>
+            <a class="button secondary" href="about.html">{{ home.secondary_button | default: '认识我' | escape }}</a>
           </div>
         </div>
-        <div class="code-card" aria-label="代码装饰卡片">
+        <div id="homeHeroVisual" class="hero-visual">
+          {% if home.hero_visual == 'image' and home.hero_image != '' %}
+          <figure class="hero-image-card">
+            <img src="{{ home.hero_image | relative_url }}" alt="{{ home.hero_image_alt | default: '首页展示图片' | escape }}" />
+          </figure>
+          {% else %}
+          <div class="code-card" aria-label="代码装饰卡片">
           <div class="code-card-top"><i></i><i></i><i></i><span>hello.js</span></div>
           <pre><code><span class="code-purple">const</span> dream = {
   idea: <span class="code-green">"做点有趣的事"</span>,
@@ -55,6 +62,8 @@ layout: null
   build();
   share();
 }</code></pre>
+          </div>
+          {% endif %}
         </div>
       </section>
 
@@ -84,7 +93,7 @@ layout: null
           <button class="filter-chip" type="button" data-filter="thinking">成长思考</button>
         </div>
 
-        <div class="article-grid" id="articleGrid" aria-live="polite">
+        <div class="article-grid article-columns-{{ home.article_columns | default: '2' }}" id="articleGrid" aria-live="polite">
           {% for post in site.posts %}
           {% assign art_index = forloop.index0 | modulo: 3 %}
           <article class="post-card{% if forloop.first %} featured{% endif %}" data-category="{{ post.category | escape }}" data-search="{{ post.title | append: ' ' | append: post.summary | append: ' ' | append: post.category_label | downcase | escape }}">
@@ -103,18 +112,18 @@ layout: null
 
       <section class="newsletter section-shell">
         <div>
-          <p class="eyebrow">KEEP BUILDING</p>
-          <h2>慢慢写，持续做。</h2>
-          <p>这个博客会和我一起成长。下一篇，也许就是一次新的尝试。</p>
+          <p class="eyebrow">{{ home.newsletter_eyebrow | default: 'KEEP BUILDING' | escape }}</p>
+          <h2>{{ home.newsletter_title | default: '慢慢写，持续做。' | escape }}</h2>
+          <p>{{ home.newsletter_text | default: '这个博客会和我一起成长。下一篇，也许就是一次新的尝试。' | escape }}</p>
         </div>
-        <a class="button primary" href="about.html">了解更多</a>
+        <a class="button primary" href="about.html">{{ home.newsletter_button | default: '了解更多' | escape }}</a>
       </section>
     </main>
 
     <footer class="site-footer">
       <div class="section-shell footer-inner">
-        <p>© <span data-current-year></span> Chu. Built by hand, with a little help from AI.</p>
-        <div class="footer-links"><a href="editor.html">写文章</a><a href="#main">回到顶部 ↑</a></div>
+        <p>© <span data-current-year></span> {{ home.footer_text | default: 'Chu. Built by hand, with a little help from AI.' | escape }}</p>
+        <div class="footer-links"><a href="editor.html">写文章</a><a href="page-editor.html">设计页面</a><a href="#main">回到顶部 ↑</a></div>
       </div>
     </footer>
   </body>

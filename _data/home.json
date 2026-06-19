@@ -1,0 +1,23 @@
+{
+  "brand": "Chu's Blog",
+  "brand_mark": "C",
+  "meta_description": "Chu 的个人博客，记录 AI Coding、Web 开发与成长思考。",
+  "eyebrow": "HELLO, WORLD!",
+  "hero_title": "把复杂的技术，",
+  "hero_highlight": "写成看得懂的故事。",
+  "hero_intro": "你好，我是 Chu。这里记录我学习 AI Coding、搭建 Web 应用，以及一路上踩过的坑和得到的灵感。",
+  "primary_button": "开始阅读",
+  "secondary_button": "认识我",
+  "newsletter_eyebrow": "KEEP BUILDING",
+  "newsletter_title": "慢慢写，持续做。",
+  "newsletter_text": "这个博客会和我一起成长。下一篇，也许就是一次新的尝试。",
+  "newsletter_button": "了解更多",
+  "footer_text": "Chu. Built by hand, with a little help from AI.",
+  "accent": "#ff5c35",
+  "accent_dark": "#d83d1b",
+  "hero_layout": "text-left",
+  "hero_visual": "code",
+  "hero_image": "",
+  "hero_image_alt": "首页展示图片",
+  "article_columns": "2"
+}

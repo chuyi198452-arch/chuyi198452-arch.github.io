@@ -68,6 +68,12 @@ button { color: inherit; }
 .button.primary:hover { background: var(--accent-dark); }
 .button.secondary { border-color: var(--line); background: var(--surface); }
 
+.hero-visual { min-width: 0; }
+.hero-layout-text-right .hero-copy { order: 2; }
+.hero-layout-text-right .hero-visual { order: 1; }
+.hero-layout-stacked { grid-template-columns: 1fr; min-height: auto; }
+.hero-layout-stacked .hero-copy { max-width: 820px; }
+.hero-layout-stacked .hero-visual { width: min(100%, 820px); }
 .code-card { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: #12231d; color: #e6efe9; box-shadow: var(--shadow); transform: rotate(2deg); }
 .code-card-top { height: 52px; padding: 0 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #2d4038; background: #172a23; }
 .code-card-top i { width: 10px; height: 10px; border-radius: 50%; background: #ff6b57; }
@@ -77,6 +83,8 @@ button { color: inherit; }
 .code-card pre { margin: 0; padding: 36px; overflow: auto; font: 500 0.95rem/1.85 ui-monospace, SFMono-Regular, Menlo, monospace; }
 .code-purple { color: #db9bff; }
 .code-green { color: #8de5ae; }
+.hero-image-card { height: clamp(360px, 42vw, 540px); margin: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface-soft); box-shadow: var(--shadow); transform: rotate(1.5deg); }
+.hero-image-card img { width: 100%; height: 100%; display: block; object-fit: cover; }
 
 .stats { display: grid; grid-template-columns: repeat(3, 1fr); margin-bottom: 112px; border-block: 1px solid var(--line); }
 .stats div { display: flex; align-items: baseline; justify-content: center; gap: 12px; padding: 30px; }
@@ -93,6 +101,8 @@ button { color: inherit; }
 .filter-chip { padding: 8px 14px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; }
 .filter-chip:hover, .filter-chip.active { border-color: var(--text); background: var(--text); color: var(--bg); }
 .article-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+.article-grid.article-columns-1 { grid-template-columns: 1fr; }
+.article-grid.article-columns-1 .post-card.featured { grid-column: span 1; }
 .post-card { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); transition: transform 180ms ease, box-shadow 180ms ease; }
 .post-card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
 .post-card.featured { grid-column: span 2; display: grid; grid-template-columns: 0.88fr 1.12fr; }
@@ -187,6 +197,27 @@ button { color: inherit; }
 .publish-result span { display: block; margin: 5px 0; color: var(--muted); }
 .publish-result a { font-weight: 750; text-decoration: underline; }
 
+.designer-page.section-shell { --max-width: 1500px; }
+.designer-workspace { display: grid; grid-template-columns: minmax(380px, 0.72fr) minmax(520px, 1.28fr); gap: 24px; align-items: start; }
+.designer-controls { min-width: 0; display: grid; gap: 20px; }
+.designer-group, .designer-preview { min-width: 0; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.designer-group { display: grid; gap: 18px; }
+.designer-group-heading { display: flex; align-items: flex-start; gap: 13px; padding-bottom: 16px; border-bottom: 1px solid var(--line); }
+.designer-group-heading > span { flex: 0 0 auto; display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--surface-soft); color: var(--accent-dark); font-size: 0.74rem; font-weight: 850; }
+.designer-group-heading h2 { margin: 0; font-size: 1.22rem; }
+.designer-group-heading p { margin: 3px 0 0; color: var(--muted); font-size: 0.82rem; }
+.designer-group label { display: grid; gap: 7px; font-size: 0.84rem; font-weight: 750; }
+.designer-group small { color: var(--muted); font-size: 0.72rem; font-weight: 500; }
+.color-field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.color-input { min-height: 48px; display: flex; align-items: center; gap: 10px; padding: 5px 12px 5px 6px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); }
+.editor-page .color-input input[type="color"] { width: 42px; min-height: 36px; padding: 0; border: 0; border-radius: 8px; cursor: pointer; }
+.color-input output { color: var(--muted); font: 650 0.78rem/1 ui-monospace, SFMono-Regular, Menlo, monospace; }
+.designer-preview { position: sticky; top: 94px; padding: 18px; }
+.designer-preview .preview-toolbar { margin: 0 0 14px; }
+.designer-preview iframe { width: 100%; height: calc(100vh - 165px); min-height: 620px; display: block; border: 1px solid var(--line); border-radius: 16px; background: var(--bg); }
+.text-button { padding: 4px 0; border: 0; background: transparent; color: var(--accent-dark); font-size: 0.78rem; font-weight: 750; cursor: pointer; }
+.designer-publish-bar { width: min(calc(100% - 40px), 1500px); }
+
 @media (max-width: 820px) {
   .hero { min-height: auto; grid-template-columns: 1fr; gap: 52px; padding-top: 70px; }
   .code-card { width: min(100%, 600px); transform: none; }
@@ -195,6 +226,9 @@ button { color: inherit; }
   .token-panel, .history-panel { grid-template-columns: 1fr; gap: 22px; }
   .editor-form { grid-template-columns: 1fr; }
   .editor-preview { max-height: 68vh; position: static; }
+  .designer-workspace { grid-template-columns: 1fr; }
+  .designer-preview { position: static; }
+  .designer-preview iframe { height: 70vh; min-height: 560px; }
 }
 
 @media (max-width: 640px) {
@@ -227,6 +261,11 @@ button { color: inherit; }
   .about-hero { grid-template-columns: 1fr; }
   .avatar { width: 120px; }
   .article-cover { min-height: 240px; }
+  .hero-layout-text-right .hero-copy, .hero-layout-text-right .hero-visual { order: initial; }
+  .hero-image-card { height: 360px; transform: none; }
+  .designer-group, .designer-preview { padding: 20px; }
+  .color-field-row { grid-template-columns: 1fr; }
+  .designer-preview iframe { min-height: 500px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
